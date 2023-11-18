@@ -3,7 +3,7 @@
 To install the tool, it is recommended to clone the project from GitHub into the `/opt/local-k8s-cluster` directory:
 
 ```bash
-git clone https://github.com/<your_username>/local-k8s-cluster.git /opt/local-k8s-cluster
+git clone https://github.com/joseandrestrujillo/local-k8s-cluster.git /opt/local-k8s-cluster
 ```
 
 Once the project is cloned, you must create a symbolic link to the `local-k8s-cluster` script so that it can be executed from anywhere on the system:
