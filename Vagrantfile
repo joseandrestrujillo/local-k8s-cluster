@@ -3,19 +3,24 @@
 
 require "yaml"
 
-require_relative "modules/cluster_data"
-require_relative "modules/nodes"
+execution_dir = File.expand_path('.')
+script_dir = File.expand_path(File.dirname(__FILE__))
 
-k8s_cluster_data = ClusterData.get_cluster_data
+
+require File.expand_path(File.join(script_dir, "modules/cluster_data"))
+require File.expand_path(File.join(script_dir, "modules/nodes"))
+require File.expand_path(File.join(script_dir, "modules/ansible_provisioning"))
+
+
+k8s_cluster_data = ClusterData.get_cluster_data(execution_dir)
 
 Vagrant.configure("2") do |config|
   Nodes.define_nodes(config, k8s_cluster_data)
 
-  config.vm.provision "ansible" do |ansible|
-    ansible.playbook = "ansible/install-dependencies.yml"
-    ansible.groups = {
-      "masters" => k8s_cluster_data["nodes"].select { |node| node["master"] }.map { |node| node["name"] },
-      "workers" => k8s_cluster_data["nodes"].reject { |node| node["master"] }.map { |node| node["name"] }
-    }
-  end
+  node_groups = {
+    "masters" => k8s_cluster_data["nodes"].select { |node| node["master"] }.map { |node| node["name"] },
+    "workers" => k8s_cluster_data["nodes"].reject { |node| node["master"] }.map { |node| node["name"] }
+  }
+
+  AnsibleProvisioning.provision_ansible(config, File.expand_path(File.join(script_dir, "ansible/install-dependencies.yml")), node_groups)
 end

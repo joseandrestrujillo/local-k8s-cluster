@@ -6,7 +6,7 @@ if [[ "$1" == "--help" ]]; then
   echo ""
   echo "Available commands:"
   echo "  deploy   Deploy the k8s cluster"
-  echo "  kubectl   Execute kubectl point to the local cluster"
+  echo "  configure-kubectl   Configure .kube/config to point kubectl to the local cluster"
   echo "  stop     Stop the k8s cluster"
   echo "  clear    Remove the k8s cluster"
   exit 0
@@ -14,33 +14,54 @@ fi
 
 action=$1
 
+executation_dir=$(pwd)
+
+script_dir=$(dirname "$(readlink -f "$0")")
+
 case $action in
 
   "deploy")
     echo "Deploying local k8s cluster..."
-    monitoring_tools=$(grep 'monitoring_tools' "k8s-cluster.yml" | cut -d ' ' -f 2)
 
-    vagrant up
+    cluster_status=$(VAGRANT_VAGRANTFILE="$script_dir/Vagrantfile" vagrant status | grep -E 'master|node[0-9]+')
+    if echo "$cluster_status" | grep -q 'poweroff'; then
+      VAGRANT_VAGRANTFILE="$script_dir/Vagrantfile" vagrant up
+    else
+      VAGRANT_VAGRANTFILE="$script_dir/Vagrantfile" vagrant up
+      
+      monitoring_tools=$(grep 'monitoring_tools' "$executation_dir/k8s-cluster.yml" | cut -d ' ' -f 2)
+      
+      ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i $executation_dir/.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory $script_dir/ansible/deploy-cluster.yml
 
-    ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory ansible/deploy-cluster.yml
-
-    if [ "$monitoring_tools" = "true" ]; then
-        ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory ansible/install-monitoring-tools.yml
+      if [ "$monitoring_tools" = "true" ]; then
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i $executation_dir/.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory $script_dir/ansible/install-monitoring-tools.yml
+      fi
     fi
+
   ;;
 
   "stop")
     echo "Stopping local k8s cluster..."
-    vagrant halt
+    VAGRANT_VAGRANTFILE="$script_dir/Vagrantfile" vagrant halt
   ;;
 
   "clear")
     echo "Destroying local k8s cluster..."
-    vagrant destroy
+    VAGRANT_VAGRANTFILE="$script_dir/Vagrantfile" vagrant destroy
   ;;
 
-  "kubectl")
-    vagrant ssh master -c "kubectl $@"
+  "configure-kubectl")
+    DOT_KUBE_DIR=~/.kube
+    if [ ! -d "$DOT_KUBE_DIR" ]; then
+      mkdir -p "$DOT_KUBE_DIR"
+    fi
+
+    FILE=$DOT_KUBE_DIR/config
+    if [ ! -f "$FILE" ]; then
+      VAGRANT_VAGRANTFILE="$script_dir/Vagrantfile" vagrant ssh master -c "cat .kube/config" > $FILE
+    fi
+
+    echo "Now you can use kubectl to interact with your local cluster"
   ;;
 
   *)
