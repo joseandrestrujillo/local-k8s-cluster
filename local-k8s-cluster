@@ -1,0 +1,44 @@
+#!/bin/bash
+
+
+if [[ "$1" == "--help" ]]; then
+  echo "Usage: $0 [command]"
+  echo ""
+  echo "Available commands:"
+  echo "  deploy   Deploy the k8s cluster"
+  echo "  stop     Stop the k8s cluster"
+  echo "  clear    Remove the k8s cluster"
+  exit 0
+fi
+
+action=$1
+
+case $action in
+
+  "deploy")
+    echo "Deploying local k8s cluster..."
+    monitoring_tools=$(grep 'monitoring_tools' "k8s-cluster.yml" | cut -d ' ' -f 2)
+
+    vagrant up
+
+    ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory ansible/deploy-cluster.yml
+
+    if [ "$monitoring_tools" = "true" ]; then
+        ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory ansible/install-monitoring-tools.yml
+    fi
+  ;;
+
+  "stop")
+    echo "Stopping local k8s cluster..."
+    vagrant halt
+  ;;
+
+  "clear")
+    echo "Destroying local k8s cluster..."
+    vagrant destroy
+  ;;
+
+  *)
+    echo "Invalid command. Use --help for help."
+  ;;
+esac
