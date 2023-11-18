@@ -1,0 +1,4 @@
+---
+- name: Install helm with snap
+  become: yes
+  shell: snap install helm --classic

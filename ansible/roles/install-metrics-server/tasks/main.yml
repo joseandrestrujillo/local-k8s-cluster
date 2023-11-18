@@ -1,0 +1,19 @@
+---
+- name: Add metrics server helm repository
+  kubernetes.core.helm_repository:
+    name: metrics-server
+    repo_url: https://kubernetes-sigs.github.io/metrics-server/
+
+- name: Install metrics server with custom values
+  kubernetes.core.helm:
+    name: metrics-server
+    namespace: kube-system
+    chart_ref: metrics-server/metrics-server
+    chart_version: 3.8.2
+    values:
+      defaultArgs:
+        - --cert-dir=/tmp
+        - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+        - --kubelet-use-node-status-port
+        - --metric-resolution=15s
+        - --kubelet-insecure-tls
