@@ -1,0 +1,14 @@
+---
+base_pkg_list:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg
+  - lsb-release
+  - net-tools
+  - software-properties-common
+
+kube_pkg_list:
+  - kubeadm=1.23.5-00
+  - kubelet=1.23.5-00
+  - kubectl=1.23.5-00

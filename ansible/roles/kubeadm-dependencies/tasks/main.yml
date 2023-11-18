@@ -1,0 +1,69 @@
+---
+- name: Letting iptables see bridged traffic
+  shell: modprobe br_netfilter
+
+- name: Add  Kubernetes bridge module
+  lineinfile:
+    path: /etc/modules-load.d/k8s.conf
+    line: br_netfilter
+    create: yes
+
+- name: Add  Kubernetes bridge sysctl ipv6
+  lineinfile:
+    path: /etc/sysctl.d/k8s.conf
+    line: net.bridge.bridge-nf-call-ip6tables = 1
+    create: yes
+
+- name: Add  Kubernetes bridge sysctl ipv4
+  lineinfile:
+    path: /etc/sysctl.d/k8s.conf
+    line: net.bridge.bridge-nf-call-iptables = 1
+    create: yes
+
+- name: Install base dependencies
+  apt:
+    name: "{{ base_pkg_list }}"
+    state: present
+    update_cache: true
+
+- name: Download the Google Cloud public signing key
+  get_url:
+    url: https://dl.k8s.io/apt/doc/apt-key.gpg
+    dest: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+
+- name: Add the Kubernetes apt repository
+  lineinfile:
+    path: /etc/apt/sources.list.d/kubernetes.list
+    line: deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main
+    create: yes
+
+- name: Get node ip
+  shell: ip addr show | grep -oE '192.168.56.[0-9]+/24' | sed 's,/24,,'
+  register: node_ip
+
+- name: Print node ip
+  debug:
+    msg: "node_ip: {{ node_ip.stdout }}"
+
+- name: Add KUBELET_EXTRA_ARGS
+  lineinfile:
+    path: /etc/default/kubelet
+    line: "KUBELET_EXTRA_ARGS=--cgroup-driver=systemd --node-ip={{ node_ip.stdout }}"
+    create: yes
+
+- name: Install k8s dependencies
+  apt:
+    name: "{{ kube_pkg_list }}"
+    state: present
+    update_cache: true
+
+- name: Hold packages
+  shell: apt-mark hold kubelet kubeadm kubectl
+
+- name: Setting up cgroups configuration
+  shell: |
+    cat <<EOF | tee /etc/systemd/system/kubelet.service.d/11-cgroups.conf
+    [Service]
+    CPUAccounting=true
+    MemoryAccounting=true
+    EOF

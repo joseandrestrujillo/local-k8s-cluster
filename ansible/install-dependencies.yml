@@ -3,3 +3,4 @@
   become: yes
   roles:
     - install-docker
+    - kubeadm-dependencies
