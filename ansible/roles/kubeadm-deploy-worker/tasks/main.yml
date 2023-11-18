@@ -1,0 +1,4 @@
+---
+- name: Join worker
+  shell: "kubeadm join 192.168.56.2:6443 --token {{ hostvars['MASTER_INFO']['TOKEN'] }} --discovery-token-ca-cert-hash sha256:{{ hostvars['MASTER_INFO']['CERT'] }}"
+  register: token
