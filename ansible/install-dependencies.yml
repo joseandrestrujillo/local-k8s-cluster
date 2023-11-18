@@ -1,7 +1,5 @@
 ---
 - hosts: all
   become: yes
-  tasks:
-    - name: Print result
-      debug:
-        msg: "Holu"
+  roles:
+    - install-docker

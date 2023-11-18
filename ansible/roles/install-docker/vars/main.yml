@@ -1,0 +1,6 @@
+---
+pkg_list:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+user: vagrant
