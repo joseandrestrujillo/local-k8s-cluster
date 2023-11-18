@@ -6,6 +6,7 @@ if [[ "$1" == "--help" ]]; then
   echo ""
   echo "Available commands:"
   echo "  deploy   Deploy the k8s cluster"
+  echo "  kubectl   Execute kubectl point to the local cluster"
   echo "  stop     Stop the k8s cluster"
   echo "  clear    Remove the k8s cluster"
   exit 0
@@ -36,6 +37,10 @@ case $action in
   "clear")
     echo "Destroying local k8s cluster..."
     vagrant destroy
+  ;;
+
+  "kubectl")
+    vagrant ssh master -c "kubectl $@"
   ;;
 
   *)
