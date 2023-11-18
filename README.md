@@ -138,6 +138,14 @@ As an open-source project, we welcome contributions of all forms.
 
 If you have an idea or find a bug, please open an issue so we can discuss it. If you wish to contribute code, please open a pull request.
 
+## Acknowledgments
+
+This project is built upon the foundation laid by the fantastic work in the Ansible playbooks repository, which is licensed under the GNU General Public License v3.0. I extend my sincere gratitude to the original authors for their valuable contributions.
+
+In the process of developing local-k8s-cluster, I've built upon and modified the Ansible playbooks to accommodate the specific requirements of this tool. Notably, I have tailored the code to support the deployment of Kubernetes clusters with more than two nodes.
+
+Original Ansible Playbooks Repository: [kubeadm-cluster](https://github.com/AudelDiaz/kubeadm-cluster/tree/main).
+
 ## License
 
 This tool is based on [this repository](https://github.com/AudelDiaz/kubeadm-cluster/tree/main).
