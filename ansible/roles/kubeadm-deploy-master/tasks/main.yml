@@ -1,0 +1,42 @@
+---
+- name: Generate random token
+  shell: kubeadm token generate
+  register: token
+
+- name: Pull config images
+  shell: kubeadm config images pull
+
+- name: Print token
+  debug:
+    msg: "token: {{ token.stdout }}"
+
+- name: Init master
+  shell: "kubeadm init --token={{ token.stdout }} --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=192.168.56.2 --kubernetes-version $(kubeadm version -o short)"
+
+- name: Register cert
+  shell: openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
+  register: cert
+
+- name: Print result
+  debug:
+    msg: "ca-cert: {{ cert.stdout }}"
+
+- name: Create user config dir
+  file:
+    path: "/home/{{ user }}/.kube"
+    state: directory
+    mode: "0755"
+
+- name: Copy config
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: "/home/{{ user }}/.kube/config"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    remote_src: yes
+
+- name: Register master information host variable
+  add_host:
+    name: "MASTER_INFO"
+    TOKEN: "{{ token.stdout }}"
+    CERT: "{{ cert.stdout }}"
