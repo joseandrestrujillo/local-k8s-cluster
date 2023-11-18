@@ -8,10 +8,16 @@
     state: present
     update_cache: true
 
+- name: Get device architecture
+  shell: facter 'architecture'
+  register: architecture
+
+- name: Print device architecture
+  debug:
+    msg: "architecture: {{ architecture.stdout }}"
+
 - name: Add docker repo
-  shell: |
-    arch=$(facter 'architecture')
-    echo "deb [arch=$arch] signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+  shell: echo "deb [arch={{ architecture.stdout }} signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 - name: Install Docker
   apt:
