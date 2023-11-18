@@ -1,0 +1,10 @@
+---
+nodes:
+  - name: master
+    master: true
+    memory: 2048
+    cpus: 2
+  - name: worker
+    master: false
+    memory: 2048
+    cpus: 2
