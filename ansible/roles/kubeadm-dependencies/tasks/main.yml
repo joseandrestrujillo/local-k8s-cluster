@@ -48,7 +48,7 @@
 - name: Add KUBELET_EXTRA_ARGS
   lineinfile:
     path: /etc/default/kubelet
-    line: "KUBELET_EXTRA_ARGS=--cgroup-driver=systemd --node-ip={{ node_ip.stdout }}"
+    line: "KUBELET_EXTRA_ARGS=--cgroup-driver=systemd --node-ip={{ node_ip.stdout }} --authentication-token-webhook=true --authorization-mode=Webhook"
     create: yes
 
 - name: Install k8s dependencies
