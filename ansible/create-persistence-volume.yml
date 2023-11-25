@@ -1,6 +1,0 @@
----
-- hosts: masters
-  become: yes
-  roles:
-    - create-storage-class
-    - create-persistence-volume

@@ -3,5 +3,7 @@
   roles:
     - install-helm
     - install-metrics-server
+    - create-storage-class
+    - create-persistence-volume
     - install-prometheus
     - install-grafana
