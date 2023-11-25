@@ -1,3 +1,4 @@
 ---
 - import_playbook: deploy-masters.yml
 - import_playbook: deploy-workers.yml
+- import_playbook: create-persistence-volume.yml

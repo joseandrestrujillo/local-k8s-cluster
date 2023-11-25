@@ -1,0 +1,10 @@
+---
+- name: Saving storageclass.yml
+  template:
+    src: ../templates/storageclass.yml.j2
+    dest: ./storageclass.yml
+    owner: vagrant
+    group: vagrant
+
+- name: Apply storage class
+  shell: kubectl apply -f ./storageclass.yml

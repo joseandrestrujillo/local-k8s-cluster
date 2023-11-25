@@ -1,5 +1,5 @@
 ---
-monitoring_tools: true
+monitoring_tools: false
 nodes:
   - name: master
     master: true

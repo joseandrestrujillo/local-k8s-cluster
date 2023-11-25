@@ -124,13 +124,13 @@ This command will delete the virtual machines that make up the cluster and the c
 
 ### Monitoring tools
 
-To run the weave scope monitoring tool, you can run the following:
+To run the prometheus + grafana monitoring tool, you can run the following:
 
 ```bash
-kubectl port-forward -n weave "$(kubectl get -n weave pod --selector=weave-scope-component=app -o jsonpath='{.items..metadata.name}')" 4040
+local-k8s-cluster expose-grafana
 ```
 
-This command will open a local port on port 4040 that will connect to the weave scope monitoring server. You can access the monitoring server at the address http://localhost:4040.
+This command will open a local port on port 30023 that will connect to the weave scope monitoring server. You can access the grafana server at the address http://localhost:30023.
 
 ## Contributing
 

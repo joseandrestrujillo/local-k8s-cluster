@@ -1,0 +1,10 @@
+---
+- name: Saving persistence-volume.yml
+  template:
+    src: ../templates/persistence-volume.yml.j2
+    dest: ./persistence-volume.yml
+    owner: vagrant
+    group: vagrant
+
+- name: Apply persistence volume
+  shell: kubectl apply -f ./persistence-volume.yml

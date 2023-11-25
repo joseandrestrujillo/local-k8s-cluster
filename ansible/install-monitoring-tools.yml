@@ -1,7 +1,7 @@
 ---
 - hosts: masters
   roles:
-    - kubeadm-deploy-weave-net
     - install-helm
     - install-metrics-server
-    - install-weave-scope
+    - install-prometheus
+    - install-grafana

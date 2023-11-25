@@ -1,0 +1,12 @@
+---
+- name: Add prometheus-comunity repo with helm
+  shell: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+
+- name: Update helm repositories
+  shell: helm repo update
+
+- name: install prometheus with helm
+  shell: helm install prometheus prometheus-community/prometheus
+
+- name: Expose service grafana-ext
+  shell: kubectl expose service prometheus-server --type=NodePort --target-port=9090 --name=prometheus-server-ext

@@ -18,6 +18,20 @@ executation_dir=$(pwd)
 
 script_dir=$(dirname "$(readlink -f "$0")")
 
+config_kubectl() {
+  DOT_KUBE_DIR=~/.kube
+  if [ ! -d "$DOT_KUBE_DIR" ]; then
+    mkdir -p "$DOT_KUBE_DIR"
+  fi
+
+  FILE=$DOT_KUBE_DIR/config
+  if [ ! -f "$FILE" ]; then
+    VAGRANT_VAGRANTFILE="$script_dir/Vagrantfile" vagrant ssh master -c "cat .kube/config" > $FILE
+  fi
+
+  echo "Now you can use kubectl to interact with your local cluster"
+}
+
 case $action in
 
   "deploy")
@@ -38,6 +52,7 @@ case $action in
       fi
     fi
 
+    config_kubectl
   ;;
 
   "stop")
@@ -51,17 +66,19 @@ case $action in
   ;;
 
   "configure-kubectl")
-    DOT_KUBE_DIR=~/.kube
-    if [ ! -d "$DOT_KUBE_DIR" ]; then
-      mkdir -p "$DOT_KUBE_DIR"
-    fi
+    config_kubectl
+  ;;
 
-    FILE=$DOT_KUBE_DIR/config
-    if [ ! -f "$FILE" ]; then
-      VAGRANT_VAGRANTFILE="$script_dir/Vagrantfile" vagrant ssh master -c "cat .kube/config" > $FILE
-    fi
+  "ssh")
+    VAGRANT_VAGRANTFILE="$script_dir/Vagrantfile" vagrant ssh $2
+  ;;
 
-    echo "Now you can use kubectl to interact with your local cluster"
+  "expose-grafana")
+    kubectl port-forward service/grafana-ext 30023:80
+  ;;
+
+  "expose-prometheus")
+    kubectl port-forward service/prometheus-server-ext 9090:80
   ;;
 
   *)

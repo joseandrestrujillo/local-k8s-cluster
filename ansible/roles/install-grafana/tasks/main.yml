@@ -1,0 +1,12 @@
+---
+- name: Add grafana repo with helm
+  shell: helm repo add grafana https://grafana.github.io/helm-charts
+
+- name: Update helm repositories
+  shell: helm repo update
+
+- name: install grafana with helm
+  shell: helm install grafana grafana/grafana
+
+- name: Expose service grafana-ext
+  shell: kubectl expose service grafana --type=NodePort --target-port=3000 --name=grafana-ext

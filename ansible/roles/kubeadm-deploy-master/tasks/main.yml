@@ -1,4 +1,8 @@
 ---
+- name: start containerd
+  become: true
+  shell: sudo systemctl start containerd
+
 - name: Generate random token
   shell: kubeadm token generate
   register: token

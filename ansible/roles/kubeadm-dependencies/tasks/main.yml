@@ -67,3 +67,11 @@
     CPUAccounting=true
     MemoryAccounting=true
     EOF
+
+- name: Create the storage folder
+  become: true
+  shell: sudo mkdir /var/local-storage
+
+- name: Change owner for the folder
+  become: true
+  shell: sudo chown 65534:65534 -R /var/local-storage
