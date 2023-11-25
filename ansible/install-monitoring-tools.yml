@@ -1,8 +1,10 @@
 ---
 - hosts: masters
   roles:
+    - kubeadm-deploy-weave-net
     - install-helm
     - install-metrics-server
+    - install-weave-scope
     - create-storage-class
     - create-persistence-volume
     - install-prometheus
